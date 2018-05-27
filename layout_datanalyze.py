@@ -198,7 +198,8 @@ class Aplicacao(tk.Frame):
 
             if dist:
                 if nome_planilha:
-                    datanalyze.projecao_pesquisa(self.banco)
+                    datanalyze.projecao_pesquisa(self.banco, int(self.projetado),
+                                                 dist, nome_planilha)
                 else:
                     msg_erro('Digite uma nome para arquivo projetado')
             else:
