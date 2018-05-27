@@ -20,10 +20,10 @@ class Entrada:
             print('retorna msg de erro')
             return ['Arquivo inexistente,\ndigite ou selecione'
                     'arquivo existente']
-        if op:
+        if op == 1:
             projecao = int(banco.shape[0])
             campo = int(banco.qt_campo.max())
-        else:
+        elif op == 0:
             if banco.shape[0] < int(projecao):
                 campo = banco.shape[0]
             else:

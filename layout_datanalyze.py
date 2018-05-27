@@ -1,6 +1,7 @@
 """Layout do programa."""
 import bd
 from msgerro import msg_erro
+from datanalyze import projecao_pesquisa
 import tkinter as tk
 from tkinter import (TOP, RIGHT, LEFT, RAISED, FLAT, SUNKEN, X, W)
 from tkinter import (PhotoImage, Button, Label, Entry, IntVar, Radiobutton)
@@ -19,6 +20,7 @@ class Aplicacao(tk.Frame):
         self.Corpo_Menu()
         self.Tela_inicial()
         self.toolbar_abrirtotal = ''
+
 
     def Corpo_Menu(self):
         """Função do Menu."""
@@ -47,7 +49,7 @@ class Aplicacao(tk.Frame):
 
         img_projecao = PhotoImage(file=r'imagens\projecao.png')
         bt_projecao = Button(toolbar, relief=FLAT, image=img_projecao,
-                             command=self.finaliza_frame)
+                             command=self.bt_projecao_click)
         bt_projecao.image = img_projecao
         bt_projecao.pack(side=LEFT, padx=2, pady=2)
 
@@ -65,11 +67,15 @@ class Aplicacao(tk.Frame):
 
     def Tela_inicial(self):
         """Corpo da tela inicial."""
-        self.lb_status = Label(root, bg='black', fg='white', pady=1,
+        self.lb_status = Label(root, bg='black', fg='white', pady=1, padx=1,
                                text='Nenhum Banco de Dados Aberto',
-                               width=w, height=3, font=('Verdana', 10, 'bold'),
+                               width=w, height=1, font=('Verdana', 10, 'bold'),
                                borderwidth=10, relief=SUNKEN)
         self.lb_status.pack()
+        self.lb_statusqt = Label(root, bg='black', fg='white', pady=1, padx=1,
+                                 width=w, height=1, font=('Verdana', 10, 'bold'),
+                                 borderwidth=10, relief=SUNKEN)
+        self.lb_statusqt.pack()
 
     def finaliza_frame(self):
         """Destroi frame ativo quando abre um novo."""
@@ -101,7 +107,6 @@ class Aplicacao(tk.Frame):
         def abrir_banco_click():
             """Abertura de campo e limpeza(exclui treinamento e vazias)."""
             nomedigitado = ed_nome.get().strip()
-            print(nomedigitado)
             estado = self.rb_projecao.get()
             qt_projecao = ed_val_projecao.get().strip()
             if nomedigitado:
@@ -111,11 +116,18 @@ class Aplicacao(tk.Frame):
                                                   op=estado,
                                                   projecao=qt_projecao)
                     if listabd:
-                        msg_erro(listabd)
                         self.banco = listabd[0]
                         self.nome_pla = listabd[1]
-                        self.projetado = listabd[2]  # arrumar dados já constam aqui
-                        self.pesq_campo = listabd[3]
+                        listcaminho = self.nome_pla.split('\\')
+                        del listcaminho[-1]
+                        self.caminho = '\\'.join(listcaminho)
+                        self.projetado = str(listabd[2])
+                        self.pesq_campo = str(listabd[3])
+                        self.lb_status['text'] = self.nome_pla
+
+                        self.lb_statusqt['text'] = 'Qt Campo: ' + \
+                            self.pesq_campo + '     Qt Projetado: ' + \
+                            self.projetado
                     else:
                         msg_erro(self.mensagem)
                 else:
@@ -127,7 +139,7 @@ class Aplicacao(tk.Frame):
 
         # banco, nome_pla, projetado, pesq_campo = bd.abrir_banco()
         # self.lb_status['text'] = f'{nome_pla}\n{projetado} {pesq_campo}'
-        self.toolbar_abrirtotal = tk.Frame(self.master, bd=1, relief=RAISED)
+        self.toolbar_abrirtotal = tk.Frame(self.master, bd=1, relief=FLAT)
         toolbaralinha = tk.Frame(self.toolbar_abrirtotal, bd=1, relief=FLAT)
         toolbar_abrir = tk.Frame(toolbaralinha, bd=1, relief=FLAT)
         modelo = r'Digite nome do arquivo igual o modelo ' \
@@ -167,8 +179,65 @@ class Aplicacao(tk.Frame):
                                command=abrir_banco_click)
         bt_abrirbanco.pack(side=TOP)
         self.toolbar_abrirtotal.pack(side=TOP)
-
         self.pack()
+
+    def bt_projecao_click(self):
+        """botao projecao."""
+
+        def abrir_pasta():
+            servidor = r'\\SERVIDOR\salvar aqui\PESQUISAS'
+            filetypes = (("xls files", "*.xls"), ("xlsx files", "*.xlsx"))
+            root.filedialog = askopenfilename(initialdir=servidor,
+                                              title="Selecione o Arquivo",
+                                              filetypes=filetypes)
+            ed_dist.insert(0, str(root.filedialog))
+
+        def bt_projetar_click(self):
+            dist = ed_dist.get().strip()
+            nome_planilha = self.caminho + '\\' + ed_nomepla.get().strip()
+
+            if dist:
+                if nome_planilha:
+                    datanalyze.projecao_pesquisa(self.banco)
+                else:
+                    msg_erro('Digite uma nome para arquivo projetado')
+            else:
+                msg_erro('Selecione ou digite arquivo distribuição')
+
+        if self.toolbar_abrirtotal:
+            self.finaliza_frame()
+        self.toolbar_abrirtotal = tk.Frame(self.master, bd=1, relief=FLAT)
+        modelo = r'Digite nome do arquivo de distribuição igual o modelo ' \
+                 r'\2018\MAIO\SÃO PAULO\DISTRIBUIÇÃO SÃO PAULO.xls'
+        lb_dist = Label(self.toolbar_abrirtotal, text=modelo)
+        lb_dist.pack(side=TOP, padx=2, pady=1)
+        toolbarlinha = tk.Frame(self.toolbar_abrirtotal, bd=1, relief=FLAT)
+        ed_dist = Entry(toolbarlinha, width=60)
+        ed_dist.pack(side=LEFT, padx=2, pady=1)
+        img_abrir = PhotoImage(file=r'imagens\abrir-menor.png')
+        bt_abrir = Button(toolbarlinha, image=img_abrir, relief=FLAT,
+                          command=abrir_pasta)
+        bt_abrir.image = img_abrir
+        bt_abrir.pack(side=LEFT, pady=1)
+        toolbarlinha.pack(side=TOP)
+        lb_nomepla = Label(self.toolbar_abrirtotal,
+                           text='Nome Arquivo Projetado')
+        lb_nomepla.pack()
+        ed_nomepla = Entry(self.toolbar_abrirtotal, width=60)
+        ed_nomepla.pack()
+        bt_projetar = Button(self.toolbar_abrirtotal, text='PROJETAR',
+                             command=self.bt_projetar_click
+        lbespaco = Label(self.toolbar_abrirtotal)
+        lbespaco.pack(side=TOP, pady=20)
+        toolbarlog = tk.Frame(self.toolbar_abrirtotal, bd=1, relief=FLAT)
+        barra = Scrollbar(self.toolbar_abrirtotal)
+        log = Text(self.toolbar_abrirtotal, width=75, height=20)
+        barra.pack(side=RIGHT, fill=Y)
+        log.pack(side=TOP)
+        barra.config(command=log.yview)
+        log.config(yscrollcommand=barra.set)
+        toolbarlog.pack(side=TOP)
+        self.toolbar_abrirtotal.pack(side=TOP)
 
 
 root = tk.Tk()

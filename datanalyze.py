@@ -9,7 +9,7 @@ import os.path
 mudanca = acerto_variavel.alterar_variavel()
 
 
-def projecao_pesquisa(banco, projetado):
+def projecao_pesquisa(banco, projetado, setor_final, nome_pla):
     """
         Agrupa variavel setor e carrega distribuição final, verifica quando
         falta cada setor. Armazena em resultado as linhas copiadas depois
@@ -512,7 +512,7 @@ def perguntas_pesquisa(banco, pesq_campo, nome_pla):
     writer.save()
 
 
-def menu():
+'''def menu():
     while True:
         print('*' * 40)
         if 'banco' in dir():
@@ -565,4 +565,4 @@ def menu():
             break
 
 
-menu()
+menu()'''
