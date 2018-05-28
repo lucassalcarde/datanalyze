@@ -1,14 +1,17 @@
 """Layout do programa."""
 import bd
 from msgerro import msg_erro
-from datanalyze import projecao_pesquisa
+import datanalyze
+import os.path
 import tkinter as tk
-from tkinter import (TOP, RIGHT, LEFT, RAISED, FLAT, SUNKEN, X, W)
-from tkinter import (PhotoImage, Button, Label, Entry, IntVar, Radiobutton)
+from tkinter import (TOP, RIGHT, LEFT, RAISED, FLAT, SUNKEN, X, W, Y)
+from tkinter import (PhotoImage, Button, Label, Entry, IntVar, Radiobutton,
+                     Scrollbar, Text, INSERT, DISABLED)
 from tkinter import *  #NOQA
 from tkinter.filedialog import askopenfilename
 
 cdados = bd.Entrada()
+trabdados = datanalyze.Trabalhando_dados()
 
 
 class Aplicacao(tk.Frame):
@@ -20,25 +23,12 @@ class Aplicacao(tk.Frame):
         self.Corpo_Menu()
         self.Tela_inicial()
         self.toolbar_abrirtotal = ''
-
+        self.caminho = ''
+        self.banco = ''
+        self.projetado = ''
 
     def Corpo_Menu(self):
         """Função do Menu."""
-        '''self.menubar = tk.Menu(self)
-        filemenu = tk.Menu(self.menubar, tearoff=0)
-        self.menubar.add_cascade(label='Dados', menu=filemenu)
-        filemenu.add_command(label='Projetar')
-
-        filemenu = tk.Menu(self.menubar, tearoff=0)
-        self.menubar.add_cascade(label='Variaveis', menu=filemenu)
-        filemenu.add_command(label='Arrumar Variaveis')
-
-        filemenu = tk.Menu(self.menubar, tearoff=0)
-        self.menubar.add()
-        filemenu.add_command(label='Sair')
-
-        self.master.config(menu=self.menubar)'''
-
         toolbar = tk.Frame(self.master, bd=1, relief=RAISED)
 
         img_abrir = PhotoImage(file=r'imagens\abrir.png')
@@ -48,14 +38,16 @@ class Aplicacao(tk.Frame):
         bt_abrir.pack(side=LEFT, padx=2, pady=2)
 
         img_projecao = PhotoImage(file=r'imagens\projecao.png')
-        bt_projecao = Button(toolbar, relief=FLAT, image=img_projecao,
-                             command=self.bt_projecao_click)
-        bt_projecao.image = img_projecao
-        bt_projecao.pack(side=LEFT, padx=2, pady=2)
+        self.bt_projecao = Button(toolbar, relief=FLAT, image=img_projecao,
+                                  command=self.bt_projecao_click,
+                                  state=DISABLED)
+        self.bt_projecao.image = img_projecao
+        self.bt_projecao.pack(side=LEFT, padx=2, pady=2)
 
-        bt_variaveis = Button(toolbar, relief=FLAT, image=img_projecao)
-        bt_variaveis.image = img_projecao
-        bt_variaveis.pack(side=LEFT, padx=2, pady=2)
+        self.bt_variaveis = Button(toolbar, relief=FLAT, image=img_projecao,
+                                   state=DISABLED)
+        self.bt_variaveis.image = img_projecao
+        self.bt_variaveis.pack(side=LEFT, padx=2, pady=2)
 
         img_sair = PhotoImage(file=r'imagens\sair.png')
         btsair = Button(toolbar, image=img_sair, relief=FLAT,
@@ -73,7 +65,8 @@ class Aplicacao(tk.Frame):
                                borderwidth=10, relief=SUNKEN)
         self.lb_status.pack()
         self.lb_statusqt = Label(root, bg='black', fg='white', pady=1, padx=1,
-                                 width=w, height=1, font=('Verdana', 10, 'bold'),
+                                 width=w, height=1,
+                                 font=('Verdana', 10, 'bold'),
                                  borderwidth=10, relief=SUNKEN)
         self.lb_statusqt.pack()
 
@@ -97,7 +90,7 @@ class Aplicacao(tk.Frame):
             self.finaliza_frame()
 
         def abrir_pasta():
-            servidor = r'\\SERVIDOR\salvar aqui\PESQUISAS'
+            servidor = r'//SERVIDOR/salvar aqui/PESQUISAS'
             filetypes = (("xls files", "*.xls"), ("xlsx files", "*.xlsx"))
             root.filedialog = askopenfilename(initialdir=servidor,
                                               title="Selecione o Arquivo",
@@ -118,9 +111,9 @@ class Aplicacao(tk.Frame):
                     if listabd:
                         self.banco = listabd[0]
                         self.nome_pla = listabd[1]
-                        listcaminho = self.nome_pla.split('\\')
+                        listcaminho = self.nome_pla.split('/')
                         del listcaminho[-1]
-                        self.caminho = '\\'.join(listcaminho)
+                        self.caminho = '/'.join(listcaminho)
                         self.projetado = str(listabd[2])
                         self.pesq_campo = str(listabd[3])
                         self.lb_status['text'] = self.nome_pla
@@ -128,6 +121,7 @@ class Aplicacao(tk.Frame):
                         self.lb_statusqt['text'] = 'Qt Campo: ' + \
                             self.pesq_campo + '     Qt Projetado: ' + \
                             self.projetado
+                        self.bt_projecao['state'] = 'normal'
                     else:
                         msg_erro(self.mensagem)
                 else:
@@ -143,7 +137,7 @@ class Aplicacao(tk.Frame):
         toolbaralinha = tk.Frame(self.toolbar_abrirtotal, bd=1, relief=FLAT)
         toolbar_abrir = tk.Frame(toolbaralinha, bd=1, relief=FLAT)
         modelo = r'Digite nome do arquivo igual o modelo ' \
-                 r'\2018\MAIO\SÃO PAULO\SÃO PAULO.xls'
+                 r'/2018/MAIO/SÃO PAULO/SÃO PAULO.xls'
         lb_nome = Label(toolbar_abrir, text=modelo, anchor=W)
         lb_nome.pack(side=TOP, padx=2, pady=12)
         ed_nome = Entry(toolbar_abrir, width=60)
@@ -182,26 +176,44 @@ class Aplicacao(tk.Frame):
         self.pack()
 
     def bt_projecao_click(self):
-        """botao projecao."""
-
+        """Click botao projecao."""
         def abrir_pasta():
-            servidor = r'\\SERVIDOR\salvar aqui\PESQUISAS'
+            servidor = r'//SERVIDOR/salvar aqui/PESQUISAS'
             filetypes = (("xls files", "*.xls"), ("xlsx files", "*.xlsx"))
             root.filedialog = askopenfilename(initialdir=servidor,
                                               title="Selecione o Arquivo",
                                               filetypes=filetypes)
             ed_dist.insert(0, str(root.filedialog))
 
-        def bt_projetar_click(self):
+        def bt_projetar_click():
             dist = ed_dist.get().strip()
-            nome_planilha = self.caminho + '\\' + ed_nomepla.get().strip()
-
+            if self.caminho:
+                nome_planilha = self.caminho + '/' + ed_nomepla.get().strip()
+            else:
+                nome_planilha = ed_nomepla.get().strip()
             if dist:
-                if nome_planilha:
-                    datanalyze.projecao_pesquisa(self.banco, int(self.projetado),
-                                                 dist, nome_planilha)
+                if os.path.isfile(dist):  # verifica se existe arquivo
+                    if ed_nomepla.get():
+                        if self.banco.shape[0] == self.projetado:  # mudar local consulta
+                            self.mensagem, log = trabdados.projecao_pesquisa(
+                                                     self.banco,
+                                                     self.projetado,
+                                                     dist, nome_planilha)
+                            if log:
+                                for l in log:
+                                    tx_log.insert(INSERT, l + '\n\n')
+
+                                self.lb_status['text'] = nome_planilha
+                                self.bt_variaveis['state'] = 'normal'
+                            else:
+                                msg_erro(self.mensagem)
+                        else:
+                            msg_erro('Pesquisa já projetada')
+                    else:
+                        msg_erro('Digite um nome para arquivo projetado')
                 else:
-                    msg_erro('Digite uma nome para arquivo projetado')
+                    msg_erro('Nome de arquivo inexistente,\ntente outra vez'
+                             ' Entre com uma Distribuição existente')
             else:
                 msg_erro('Selecione ou digite arquivo distribuição')
 
@@ -209,7 +221,7 @@ class Aplicacao(tk.Frame):
             self.finaliza_frame()
         self.toolbar_abrirtotal = tk.Frame(self.master, bd=1, relief=FLAT)
         modelo = r'Digite nome do arquivo de distribuição igual o modelo ' \
-                 r'\2018\MAIO\SÃO PAULO\DISTRIBUIÇÃO SÃO PAULO.xls'
+                 r'/2018/MAIO/SÃO PAULO/DISTRIBUIÇÃO SÃO PAULO.xls'
         lb_dist = Label(self.toolbar_abrirtotal, text=modelo)
         lb_dist.pack(side=TOP, padx=2, pady=1)
         toolbarlinha = tk.Frame(self.toolbar_abrirtotal, bd=1, relief=FLAT)
@@ -227,16 +239,17 @@ class Aplicacao(tk.Frame):
         ed_nomepla = Entry(self.toolbar_abrirtotal, width=60)
         ed_nomepla.pack()
         bt_projetar = Button(self.toolbar_abrirtotal, text='PROJETAR',
-                             command=self.bt_projetar_click
+                             command=bt_projetar_click)
+        bt_projetar.pack()
         lbespaco = Label(self.toolbar_abrirtotal)
         lbespaco.pack(side=TOP, pady=20)
         toolbarlog = tk.Frame(self.toolbar_abrirtotal, bd=1, relief=FLAT)
         barra = Scrollbar(self.toolbar_abrirtotal)
-        log = Text(self.toolbar_abrirtotal, width=75, height=20)
+        tx_log = Text(self.toolbar_abrirtotal, width=75, height=20)
         barra.pack(side=RIGHT, fill=Y)
-        log.pack(side=TOP)
-        barra.config(command=log.yview)
-        log.config(yscrollcommand=barra.set)
+        tx_log.pack(side=TOP)
+        barra.config(command=tx_log.yview)
+        tx_log.config(yscrollcommand=barra.set)
         toolbarlog.pack(side=TOP)
         self.toolbar_abrirtotal.pack(side=TOP)
 
