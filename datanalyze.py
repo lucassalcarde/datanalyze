@@ -83,7 +83,7 @@ class Trabalhando_dados:
         resultado.to_excel(writer, 'Plan1')
         writer.save()
         self.banco = pd.read_excel(nome_pla, 'Plan1')
-        return ['ok', log]  # verificar o que precisa retornar
+        return ['ok', log, self.banco]  # verificar o que precisa retornar
 
     def arruma_variaveis_sexo(banco, pesq_campo):
         """
