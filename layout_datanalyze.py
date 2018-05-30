@@ -22,39 +22,40 @@ class Aplicacao(tk.Frame):
         tk.Frame.__init__(self, master, bd=2)
         self.Corpo_Menu()
         self.Tela_inicial()
-        self.toolbar_abrirtotal = ''
-        self.caminho = ''
-        self.banco = ''
-        self.projetado = ''
+        self.frametl_abrirtotal = ''  # frame externo usado construir cada tela
+        self.caminho = ''  # caminho banco de dados
+        self.banco = ''  # dataframe
+        self.pesq_campo = ''  # armazena qt entrevistas feitas em campo
+        self.projetado = ''  # qt entrevistas final
 
     def Corpo_Menu(self):
         """Função do Menu."""
-        toolbar = tk.Frame(self.master, bd=1, relief=RAISED)
+        frametl = tk.Frame(self.master, bd=1, relief=RAISED)
 
         img_abrir = PhotoImage(file=r'imagens\abrir.png')
-        bt_abrir = Button(toolbar, image=img_abrir, relief=FLAT,
+        bt_abrir = Button(frametl, image=img_abrir, relief=FLAT,
                           command=self.bt_abrir_click)
         bt_abrir.image = img_abrir
         bt_abrir.pack(side=LEFT, padx=2, pady=2)
 
         img_projecao = PhotoImage(file=r'imagens\projecao.png')
-        self.bt_projecao = Button(toolbar, relief=FLAT, image=img_projecao,
+        self.bt_projecao = Button(frametl, relief=FLAT, image=img_projecao,
                                   command=self.bt_projecao_click,
                                   state=DISABLED)
         self.bt_projecao.image = img_projecao
         self.bt_projecao.pack(side=LEFT, padx=2, pady=2)
 
-        self.bt_variaveis = Button(toolbar, relief=FLAT, image=img_projecao,
-                                   state=DISABLED)
+        self.bt_variaveis = Button(frametl, relief=FLAT, image=img_projecao,
+                                   command=self.bt_variaveis_click)  # state=DISABLED,
         self.bt_variaveis.image = img_projecao
         self.bt_variaveis.pack(side=LEFT, padx=2, pady=2)
 
         img_sair = PhotoImage(file=r'imagens\sair.png')
-        btsair = Button(toolbar, image=img_sair, relief=FLAT,
+        btsair = Button(frametl, image=img_sair, relief=FLAT,
                         command=self.quit)
         btsair.image = img_sair
         btsair.pack(side=RIGHT, padx=2, pady=2)
-        toolbar.pack(side=TOP, fill=X)
+        frametl.pack(side=TOP, fill=X)
         self.pack()
 
     def Tela_inicial(self):
@@ -72,7 +73,7 @@ class Aplicacao(tk.Frame):
 
     def finaliza_frame(self):
         """Destroi frame ativo quando abre um novo."""
-        self.toolbar_abrirtotal.destroy()
+        self.frametl_abrirtotal.destroy()
 
     '''def msg_erro(self):
         """Popup de mensagens de erro."""
@@ -98,7 +99,7 @@ class Aplicacao(tk.Frame):
 
     def bt_abrir_click(self):
         """Função botão abrir."""
-        if self.toolbar_abrirtotal:
+        if self.frametl_abrirtotal:
             self.finaliza_frame()
 
         def abrir_banco_click():
@@ -125,6 +126,8 @@ class Aplicacao(tk.Frame):
                         self.lb_statusqt['text'] = 'Qt Campo: ' + \
                             self.pesq_campo + '     Qt Projetado: ' + \
                             self.projetado
+                        if self.banco.shape[0] == self.projetado:
+                            self.bt_variaveis['state'] = 'normal'
                         self.bt_projecao['state'] = 'normal'
                     else:
                         msg_erro(self.mensagem)
@@ -137,47 +140,46 @@ class Aplicacao(tk.Frame):
 
         # banco, nome_pla, projetado, pesq_campo = bd.abrir_banco()
         # self.lb_status['text'] = f'{nome_pla}\n{projetado} {pesq_campo}'
-        self.toolbar_abrirtotal = tk.Frame(self.master, bd=1, relief=FLAT)
-        toolbaralinha = tk.Frame(self.toolbar_abrirtotal, bd=1, relief=FLAT)
-        toolbar_abrir = tk.Frame(toolbaralinha, bd=1, relief=FLAT)
+        self.frametl_abrirtotal = tk.Frame(self.master, bd=1, relief=FLAT)
+        frametlalinha = tk.Frame(self.frametl_abrirtotal, bd=1, relief=FLAT)
+        frametl_abrir = tk.Frame(frametlalinha, bd=1, relief=FLAT)
         modelo = r'Digite nome do arquivo igual o modelo ' \
                  r'/2018/MAIO/SÃO PAULO/SÃO PAULO.xls'
-        lb_nome = Label(toolbar_abrir, text=modelo, anchor=W)
+        lb_nome = Label(frametl_abrir, text=modelo, anchor=W)
         lb_nome.pack(side=TOP, padx=2, pady=12)
-        self.ed_nome = Entry(toolbar_abrir, width=60)
+        self.ed_nome = Entry(frametl_abrir, width=60)
         self.ed_nome.pack(side=LEFT, padx=2, pady=12)
         img_abrir = PhotoImage(file=r'imagens\abrir-menor.png')
-        bt_abrir = Button(toolbar_abrir, image=img_abrir, relief=FLAT,
+        bt_abrir = Button(frametl_abrir, image=img_abrir, relief=FLAT,
                           command=self.abrir_pasta)
         bt_abrir.image = img_abrir
         bt_abrir.pack(side=LEFT, pady=12)
-        toolbar_abrir.pack(side=LEFT)
+        frametl_abrir.pack(side=LEFT)
 
-        toolbar_projecao = tk.Frame(toolbaralinha, bd=1, relief=FLAT)
-        lb_projecao = Label(toolbar_projecao,
+        frametl_projecao = tk.Frame(frametlalinha, bd=1, relief=FLAT)
+        lb_projecao = Label(frametl_projecao,
                             text='Arquivo Já está projetado?')
         lb_projecao.pack(side=TOP, padx=2, pady=2)
         self.rb_projecao = IntVar()
         self.rb_projecao.set(0)
-        Radiobutton(toolbar_projecao, text='Não Projetado', value=0,
+        Radiobutton(frametl_projecao, text='Não Projetado', value=0,
                     variable=self.rb_projecao).pack(anchor=W)
-        Radiobutton(toolbar_projecao, text='Projetado', value=1,
+        Radiobutton(frametl_projecao, text='Projetado', value=1,
                     variable=self.rb_projecao).pack(anchor=W)
-        toolbar_projecao.pack(side=LEFT, padx=50)
+        frametl_projecao.pack(side=LEFT, padx=50)
 
-        toolbar_val_projecao = tk.Frame(toolbaralinha, bd=1,
+        frametl_val_projecao = tk.Frame(frametlalinha, bd=1,
                                         relief=FLAT)
-        lb_val_projecao = Label(toolbar_val_projecao, text='Valor Projeção')
+        lb_val_projecao = Label(frametl_val_projecao, text='Valor Projeção')
         lb_val_projecao.pack(side=TOP, ipadx=2, pady=13)
-        ed_val_projecao = Entry(toolbar_val_projecao, width=20)
+        ed_val_projecao = Entry(frametl_val_projecao, width=20)
         ed_val_projecao.pack(side=TOP, padx=2, pady=13)
-        toolbar_val_projecao.pack(side=LEFT)
-        toolbaralinha.pack(side=TOP)
-        bt_abrirbanco = Button(self.toolbar_abrirtotal, text='ABRIR',
+        frametl_val_projecao.pack(side=LEFT)
+        frametlalinha.pack(side=TOP)
+        bt_abrirbanco = Button(self.frametl_abrirtotal, text='ABRIR',
                                command=abrir_banco_click)
         bt_abrirbanco.pack(side=TOP)
-        self.toolbar_abrirtotal.pack(side=TOP)
-        self.pack()
+        self.frametl_abrirtotal.pack(side=TOP)
 
     def bt_projecao_click(self):
         """Click botao projecao."""
@@ -205,6 +207,7 @@ class Aplicacao(tk.Frame):
                         if listapj:
                             for l in listapj[0]:
                                 tx_log.insert(INSERT, l + '\n\n')
+                            self.log_geral = listapj[0]
                             self.banco = listapj[1]
                             self.lb_status['text'] = nome_planilha
                             self.bt_variaveis['state'] = 'normal'
@@ -219,43 +222,88 @@ class Aplicacao(tk.Frame):
             else:
                 msg_erro('Selecione ou digite arquivo distribuição')
 
-        if self.toolbar_abrirtotal:
+        if self.frametl_abrirtotal:
             self.finaliza_frame()
-        self.toolbar_abrirtotal = tk.Frame(self.master, bd=1, relief=FLAT)
+        self.frametl_abrirtotal = tk.Frame(self.master, bd=1, relief=FLAT)
         modelo = r'Digite nome do arquivo de distribuição igual o modelo ' \
                  r'/2018/MAIO/SÃO PAULO/DISTRIBUIÇÃO SÃO PAULO.xls'
-        lb_dist = Label(self.toolbar_abrirtotal, text=modelo)
+        lb_dist = Label(self.frametl_abrirtotal, text=modelo)
         lb_dist.pack(side=TOP, padx=2, pady=1)
-        toolbarlinha = tk.Frame(self.toolbar_abrirtotal, bd=1, relief=FLAT)
-        self.ed_dist = Entry(toolbarlinha, width=60)
+        frametllinha = tk.Frame(self.frametl_abrirtotal, bd=1, relief=FLAT)
+        self.ed_dist = Entry(frametllinha, width=60)
         self.ed_dist.pack(side=LEFT, padx=2, pady=1)
         img_abrir = PhotoImage(file=r'imagens\abrir-menor.png')
-        bt_abrir = Button(toolbarlinha, image=img_abrir, relief=FLAT,
+        bt_abrir = Button(frametllinha, image=img_abrir, relief=FLAT,
                           command=self.abrir_pasta)
         bt_abrir.image = img_abrir
         bt_abrir.pack(side=LEFT, pady=1)
-        toolbarlinha.pack(side=TOP)
-        lb_nomepla = Label(self.toolbar_abrirtotal,
+        frametllinha.pack(side=TOP)
+        lb_nomepla = Label(self.frametl_abrirtotal,
                            text='Nome Arquivo Projetado')
         lb_nomepla.pack()
-        ed_nomepla = Entry(self.toolbar_abrirtotal, width=60)
+        ed_nomepla = Entry(self.frametl_abrirtotal, width=60)
         ed_nomepla.pack()
-        bt_projetar = Button(self.toolbar_abrirtotal, text='PROJETAR',
+        bt_projetar = Button(self.frametl_abrirtotal, text='PROJETAR',
                              command=bt_projetar_click)
         bt_projetar.pack()
         if int(self.banco.shape[0]) == int(self.projetado):
             bt_projetar['state'] = DISABLED
-        lbespaco = Label(self.toolbar_abrirtotal)
+        lbespaco = Label(self.frametl_abrirtotal)
         lbespaco.pack(side=TOP, pady=20)
-        toolbarlog = tk.Frame(self.toolbar_abrirtotal, bd=1, relief=FLAT)
-        barra = Scrollbar(self.toolbar_abrirtotal)
-        tx_log = Text(self.toolbar_abrirtotal, width=75, height=20)
+        frametllog = tk.Frame(self.frametl_abrirtotal, bd=1, relief=FLAT)
+        barra = Scrollbar(self.frametl_abrirtotal)
+        tx_log = Text(self.frametl_abrirtotal, width=75, height=20)
         barra.pack(side=RIGHT, fill=Y)
         tx_log.pack(side=TOP)
         barra.config(command=tx_log.yview)
         tx_log.config(yscrollcommand=barra.set)
-        toolbarlog.pack(side=TOP)
-        self.toolbar_abrirtotal.pack(side=TOP)
+        frametllog.pack(side=TOP)
+        self.frametl_abrirtotal.pack(side=TOP)
+
+    def bt_variaveis_click(self):
+        """Criar tela para analise e acerto de variaveis."""
+        if self.frametl_abrirtotal:
+            self.finaliza_frame()
+
+        def bt_sexo_click():
+            trabdados.arruma_variaveis_sexo(self.banco, self.pesq_campo)
+
+        def bt_idade_click():
+            pass
+
+        def bt_escolaridade_click():
+            pass
+
+        def bt_religiao_click():
+            pass
+
+        self.frametl_abrirtotal = tk.Frame(self.master, bd=1, relief=FLAT)
+        frametl_left = tk.Frame(self.frametl_abrirtotal, bd=1, relief=FLAT)
+        bt_todos = Button(frametl_left, text='ARRUMAR TODOS',
+                          command='', width=20)
+        bt_todos.pack(side=TOP, pady=20)
+        bt_sexo = Button(frametl_left, text='SEXO', command=bt_sexo_click,
+                         width=20)
+        bt_sexo.pack(side=TOP, pady=20)
+        bt_idade = Button(frametl_left, text='IDADE', command=bt_idade_click,
+                          width=20)
+        bt_idade.pack(side=TOP, pady=20)
+        bt_escolaridade = Button(frametl_left, text='ESCOLARIDADE',
+                                 command=bt_escolaridade_click, width=20)
+        bt_escolaridade.pack(side=TOP, pady=20)
+        bt_religiao = Button(frametl_left, text='RELIGIÃO',
+                             command=bt_religiao_click, width=20)
+        bt_religiao.pack(side=TOP, pady=20)
+        frametl_left.pack(side=LEFT, pady=80, padx=20)
+        frametl_right = tk.Frame(self.frametl_abrirtotal, bd=1, relief=FLAT)
+        barra = Scrollbar(frametl_right)
+        tx_log = Text(frametl_right, width=75, height=20)
+        barra.pack(side=RIGHT, fill=Y)
+        tx_log.pack(side=TOP)
+        barra.config(command=tx_log.yview)
+        tx_log.config(yscrollcommand=barra.set)
+        frametl_right.pack(side=LEFT, pady=80, padx=20)
+        self.frametl_abrirtotal.pack(side=TOP)
 
 
 root = tk.Tk()
