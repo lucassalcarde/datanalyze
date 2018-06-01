@@ -1,7 +1,9 @@
 """Layout do programa."""
 import bd
 from msgerro import msg_erro
+import projetarbanco
 import datanalyze
+import arquivo
 import os.path
 import tkinter as tk
 from tkinter import (TOP, RIGHT, LEFT, RAISED, FLAT, SUNKEN, X, W, Y)
@@ -11,7 +13,8 @@ from tkinter import *  #NOQA
 from tkinter.filedialog import askopenfilename
 
 cdados = bd.Entrada()
-trabdados = datanalyze.Trabalhando_dados()
+trabdados = projetarbanco.Trabalhando_dados()
+trabvar = datanalyze.Trabalhando_var()
 
 
 class Aplicacao(tk.Frame):
@@ -205,9 +208,9 @@ class Aplicacao(tk.Frame):
                                                       self.projetado,
                                                       dist, nome_planilha)
                         if listapj:
+                            arquivo.grava_arquivo(self.caminho, listapj[0])
                             for l in listapj[0]:
                                 tx_log.insert(INSERT, l + '\n\n')
-                            self.log_geral = listapj[0]
                             self.banco = listapj[1]
                             self.lb_status['text'] = nome_planilha
                             self.bt_variaveis['state'] = 'normal'
@@ -266,7 +269,13 @@ class Aplicacao(tk.Frame):
             self.finaliza_frame()
 
         def bt_sexo_click():
-            trabdados.arruma_variaveis_sexo(self.banco, self.pesq_campo)
+            """função para analise e acerto de sexo."""
+            *listavar = trabvar.arruma_variaveis_sexo(self.banco,
+                                                      self.pesq_campo)
+            # arquivo.grava_arquivo(self.caminho, listavar[0])
+            for l in listavar[0]:
+                tx_log.insert(INSERT, l + '\n\n')
+            self.banco = listavar[1]
 
         def bt_idade_click():
             pass
