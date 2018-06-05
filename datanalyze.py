@@ -25,40 +25,48 @@ class Trabalhando_var:
         """
         self.banco = banco
         log = []
-        sexo = banco.groupby('SEXO').size()
-        menor_sexo = int(floor(0.5050 * banco.shape[0]))
-        maior_sexo = int(0.54 * banco.shape[0])
-        log.append(sexo)
+        sexo = self.banco.groupby('SEXO').size()
+        menor_sexo = int(floor(0.5050 * self.banco.shape[0]))
+        maior_sexo = int(0.54 * self.banco.shape[0])
         # define valor do FEMININO
         sexo_alterado = randint(menor_sexo, maior_sexo)
         pergunta = 'SEXO'
+        log.append('FEMININO ' + str(sexo[0]) + ' - MASCULINO ' + str(sexo[1]))
 
         if sexo.FEMININO > sexo_alterado:  # Entra se tiver muito Feminino
             alter_mudar = 'FEMININO'
             alter_corrente = 'MASCULINO'
             # diferença a ser alterada
             diferenca = sexo.FEMININO - sexo_alterado
-            log.append(sexo[0], sexo_alterado, diferenca)
-            mudanca.mudar_alternativa(banco=banco, pesq_campo=pesq_campo,
-                                      pergunta=pergunta,
-                                      alter_corrente=alter_corrente,
-                                      alter_mudar=alter_mudar,
-                                      diferenca=diferenca,
-                                      valor_alterado=sexo_alterado)
+            log.append('FEMININO ' + str(sexo.FEMININO) + ' - VALOR FINAL ' +
+                       str(sexo_alterado) + ' - DIFERENÇA ' + str(diferenca))
+            msg, self.banco = mudanca.mudar_alternativa(
+                                  banco=self.banco,
+                                  pesq_campo=pesq_campo,
+                                  pergunta=pergunta,
+                                  alter_corrente=alter_corrente,
+                                  alter_mudar=alter_mudar,
+                                  diferenca=diferenca,
+                                  valor_alterado=sexo_alterado)
+            log.append(msg)
         elif sexo.MASCULINO > sexo_alterado:  # Entre se tiver muito Masculino
             alter_mudar = 'MASCULINO'
             alter_corrente = 'FEMININO'
             # define valor masculino
-            sexo_alterado = banco.shape[0] - sexo_alterado
+            sexo_alterado = self.banco.shape[0] - sexo_alterado
             # diferença a ser alterada
             diferenca = sexo.MASCULINO - sexo_alterado
-            log.append('segundo', sexo.MASCULINO, sexo_alterado, diferenca)
-            mudanca.mudar_alternativa(banco=banco, pesq_campo=pesq_campo,
-                                      pergunta=pergunta,
-                                      alter_corrente=alter_corrente,
-                                      alter_mudar=alter_mudar,
-                                      diferenca=diferenca,
-                                      valor_alterado=sexo_alterado)
+            log.append('MASCULINO ' + str(sexo.MASCULINO) + ' - VALOR FINAL' +
+                       str(sexo_alterado) + ' - DIFENRENÇA' + str(diferenca))
+            msg, self.banco = mudanca.mudar_alternativa(
+                                  banco=self.banco,
+                                  pesq_campo=pesq_campo,
+                                  pergunta=pergunta,
+                                  alter_corrente=alter_corrente,
+                                  alter_mudar=alter_mudar,
+                                  diferenca=diferenca,
+                                  valor_alterado=sexo_alterado)
+            log.append(msg)
         else:
             log.append('Variavel sexo com valor aceitavel!')
         return [log, self.banco]

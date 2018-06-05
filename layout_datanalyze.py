@@ -270,9 +270,10 @@ class Aplicacao(tk.Frame):
 
         def bt_sexo_click():
             """função para analise e acerto de sexo."""
-            *listavar = trabvar.arruma_variaveis_sexo(self.banco,
-                                                      self.pesq_campo)
+            listavar = trabvar.arruma_variaveis_sexo(self.banco,
+                                                     int(self.pesq_campo))
             # arquivo.grava_arquivo(self.caminho, listavar[0])
+            print(listavar[0])
             for l in listavar[0]:
                 tx_log.insert(INSERT, l + '\n\n')
             self.banco = listavar[1]
