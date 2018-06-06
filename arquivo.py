@@ -16,4 +16,5 @@ def grava_arquivo(caminho, texto):
     linha = ''
     for linha in texto:
         arq.write(linha + '\n')
+    arq.write('\n')
     arq.close

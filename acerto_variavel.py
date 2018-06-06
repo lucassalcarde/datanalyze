@@ -1,14 +1,13 @@
 """Arquivo com função que faz analise e alteração das variaveis."""
 from math import floor, ceil
-from fractions import Fraction
 
 
-class alterar_variavel:
+class AlterarVariavel:
     """Classe altera variaveis."""
 
     def __init__(self):
         """Função inicializa."""
-        super(alterar_variavel, self).__init__()
+        super(AlterarVariavel, self).__init__()
 
     def mudar_alternativa(self, banco, pesq_campo, pergunta,
                           alter_corrente, alter_mudar, diferenca,
@@ -18,8 +17,10 @@ class alterar_variavel:
                                    (banco.index >= pesq_campo)].index)
         pulo = floor(len(lista_indices) / diferenca)
         resto = 0
+        mensagem = ''
         if pulo == 0:
-            mensagem = 'Número insuficiente de' + alter_mudar + 'na projeção'
+            mensagem = 'Número insuficiente de ' + alter_mudar +\
+                       ' na projeção'
             pulo = 1
         elif pulo == 1 and len(lista_indices) % diferenca != 0:
             resto = ceil(diferenca / (len(lista_indices) - diferenca))
@@ -45,8 +46,8 @@ class alterar_variavel:
             pulo = floor(cont_pulo / (diferenca - contador))
             resto = 0
             if pulo == 0:
-                mensagem = 'Número insuficiente de' + alter_mudar + \
-                    'no banco de dados. Erro'
+                mensagem = 'Número insuficiente de ' + alter_mudar + \
+                    ' no banco de dados. Erro'
                 pulo = 1
             elif pulo == 1 and cont_pulo % (diferenca - contador) != 0:
                 resto = ceil((diferenca - contador) /
@@ -63,5 +64,5 @@ class alterar_variavel:
                 contador += 1
                 valor_corrente = banco.groupby(pergunta).size()
         if alter_corrente == '31 a 50' or alter_corrente == 'ENSINO MÉDIO':
-            return diferenca - contador
-        return mensagem, banco
+            return mensagem, (diferenca - contador)
+        return mensagem

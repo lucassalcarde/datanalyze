@@ -4,6 +4,7 @@ from msgerro import msg_erro
 import projetarbanco
 import datanalyze
 import arquivo
+from salva_arquivo import salvando_arquivo
 import os.path
 import tkinter as tk
 from tkinter import (TOP, RIGHT, LEFT, RAISED, FLAT, SUNKEN, X, W, Y)
@@ -13,8 +14,8 @@ from tkinter import *  #NOQA
 from tkinter.filedialog import askopenfilename
 
 cdados = bd.Entrada()
-trabdados = projetarbanco.Trabalhando_dados()
-trabvar = datanalyze.Trabalhando_var()
+trabdados = projetarbanco.TrabalhandoDados()
+trabvar = datanalyze.TrabalhandoVar()
 
 
 class Aplicacao(tk.Frame):
@@ -49,7 +50,8 @@ class Aplicacao(tk.Frame):
         self.bt_projecao.pack(side=LEFT, padx=2, pady=2)
 
         self.bt_variaveis = Button(frametl, relief=FLAT, image=img_projecao,
-                                   command=self.bt_variaveis_click)  # state=DISABLED,
+                                   command=self.bt_variaveis_click,
+                                   state=DISABLED)
         self.bt_variaveis.image = img_projecao
         self.bt_variaveis.pack(side=LEFT, padx=2, pady=2)
 
@@ -131,7 +133,10 @@ class Aplicacao(tk.Frame):
                             self.projetado
                         if self.banco.shape[0] == self.projetado:
                             self.bt_variaveis['state'] = 'normal'
-                        self.bt_projecao['state'] = 'normal'
+                        if estado == 1:
+                            self.bt_variaveis['state'] = 'normal'
+                        elif estado == 0:
+                            self.bt_projecao['state'] = 'normal'
                     else:
                         msg_erro(self.mensagem)
                 else:
@@ -197,16 +202,17 @@ class Aplicacao(tk.Frame):
         def bt_projetar_click():
             dist = self.ed_dist.get().strip()
             if self.caminho:
-                nome_planilha = self.caminho + '/' + ed_nomepla.get().strip()
+                nome_planilha = self.caminho + '/' + \
+                                     ed_nomepla.get().strip()
             else:
                 nome_planilha = ed_nomepla.get().strip()
             if dist:
                 if os.path.isfile(dist):  # verifica se existe arquivo
                     if ed_nomepla.get():
                         self.mensagem, *listapj = trabdados.projecao_pesquisa(
-                                                      self.banco,
-                                                      self.projetado,
-                                                      dist, nome_planilha)
+                                                     self.banco,
+                                                     self.projetado,
+                                                     dist, nome_planilha)
                         if listapj:
                             arquivo.grava_arquivo(self.caminho, listapj[0])
                             for l in listapj[0]:
@@ -267,24 +273,35 @@ class Aplicacao(tk.Frame):
         """Criar tela para analise e acerto de variaveis."""
         if self.frametl_abrirtotal:
             self.finaliza_frame()
+        nome_planilha = self.lb_status.cget('text')
 
         def bt_sexo_click():
             """função para analise e acerto de sexo."""
             listavar = trabvar.arruma_variaveis_sexo(self.banco,
                                                      int(self.pesq_campo))
             # arquivo.grava_arquivo(self.caminho, listavar[0])
-            print(listavar[0])
+            arquivo.grava_arquivo(self.caminho, listavar[0])
             for l in listavar[0]:
                 tx_log.insert(INSERT, l + '\n\n')
-            self.banco = listavar[1]
+            salvando_arquivo(self.banco, nome_planilha)
+            bt_sexo['state'] = DISABLED
 
         def bt_idade_click():
-            pass
+            """função para analise e acerto de idade."""
+            listavar = trabvar.arrumar_variaveis_idade(self.banco,
+                                                       int(self.pesq_campo))
+            # arquivo.grava_arquivo(self.caminho, listavar[0])
+            for l in listavar[0]:
+                tx_log.insert(INSERT, l + '\n\n')
+            salvando_arquivo(self.banco, nome_planilha)
+            bt_idade['state'] = DISABLED
 
         def bt_escolaridade_click():
+            """função para analise e acerto de escolaridade."""
             pass
 
         def bt_religiao_click():
+            """função para analise e acerto de religião."""
             pass
 
         self.frametl_abrirtotal = tk.Frame(self.master, bd=1, relief=FLAT)

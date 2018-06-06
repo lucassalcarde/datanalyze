@@ -1,19 +1,19 @@
 """Classe e Funções que analizam e corrigem diferenças no banco de dados."""
+import acerto_variavel
 import pandas as pd
 from math import floor
 from random import randint, choice
-import acerto_variavel
 
 
-mudanca = acerto_variavel.alterar_variavel()
+mudanca = acerto_variavel.AlterarVariavel()
 
 
-class Trabalhando_var:
+class TrabalhandoVar:
     """Classe com funções que analisam banco de dados."""
 
     def __init__(self):
         """inicializadora."""
-        self.banco = ''
+        super(TrabalhandoVar, self).__init__()
 
     def arruma_variaveis_sexo(self, banco, pesq_campo):
         """
@@ -23,11 +23,10 @@ class Trabalhando_var:
         vai de opção em opção da variavel verificando
         onde tem que aumentar e onde tem que diminuir
         """
-        self.banco = banco
         log = []
-        sexo = self.banco.groupby('SEXO').size()
-        menor_sexo = int(floor(0.5050 * self.banco.shape[0]))
-        maior_sexo = int(0.54 * self.banco.shape[0])
+        sexo = banco.groupby('SEXO').size()
+        menor_sexo = int(floor(0.5050 * banco.shape[0]))
+        maior_sexo = int(0.54 * banco.shape[0])
         # define valor do FEMININO
         sexo_alterado = randint(menor_sexo, maior_sexo)
         pergunta = 'SEXO'
@@ -40,38 +39,42 @@ class Trabalhando_var:
             diferenca = sexo.FEMININO - sexo_alterado
             log.append('FEMININO ' + str(sexo.FEMININO) + ' - VALOR FINAL ' +
                        str(sexo_alterado) + ' - DIFERENÇA ' + str(diferenca))
-            msg, self.banco = mudanca.mudar_alternativa(
-                                  banco=self.banco,
-                                  pesq_campo=pesq_campo,
-                                  pergunta=pergunta,
-                                  alter_corrente=alter_corrente,
-                                  alter_mudar=alter_mudar,
-                                  diferenca=diferenca,
-                                  valor_alterado=sexo_alterado)
-            log.append(msg)
+            msg = mudanca.mudar_alternativa(
+                      banco=banco,
+                      pesq_campo=pesq_campo,
+                      pergunta=pergunta,
+                      alter_corrente=alter_corrente,
+                      alter_mudar=alter_mudar,
+                      diferenca=diferenca,
+                      valor_alterado=sexo_alterado)
+            if msg:
+                log.append(msg)
         elif sexo.MASCULINO > sexo_alterado:  # Entre se tiver muito Masculino
             alter_mudar = 'MASCULINO'
             alter_corrente = 'FEMININO'
             # define valor masculino
-            sexo_alterado = self.banco.shape[0] - sexo_alterado
+            sexo_alterado = banco.shape[0] - sexo_alterado
             # diferença a ser alterada
             diferenca = sexo.MASCULINO - sexo_alterado
             log.append('MASCULINO ' + str(sexo.MASCULINO) + ' - VALOR FINAL' +
-                       str(sexo_alterado) + ' - DIFENRENÇA' + str(diferenca))
-            msg, self.banco = mudanca.mudar_alternativa(
-                                  banco=self.banco,
-                                  pesq_campo=pesq_campo,
-                                  pergunta=pergunta,
-                                  alter_corrente=alter_corrente,
-                                  alter_mudar=alter_mudar,
-                                  diferenca=diferenca,
-                                  valor_alterado=sexo_alterado)
-            log.append(msg)
+                       str(sexo_alterado) + ' - DIFERENÇA' + str(diferenca))
+            msg = mudanca.mudar_alternativa(
+                      banco=banco,
+                      pesq_campo=pesq_campo,
+                      pergunta=pergunta,
+                      alter_corrente=alter_corrente,
+                      alter_mudar=alter_mudar,
+                      diferenca=diferenca,
+                      valor_alterado=sexo_alterado)
+            if msg:
+                log.append(msg)
         else:
             log.append('Variavel sexo com valor aceitavel!')
-        return [log, self.banco]
+        sexo = banco.groupby('SEXO').size()
+        log.append('FEMININO ' + str(sexo[0]) + ' - MASCULINO ' + str(sexo[1]))
+        return [log]
 
-    def arrumar_variaveis_idade(banco, pesq_campo):
+    def arrumar_variaveis_idade(self, banco, pesq_campo):
         """
         Função Arruma variavel Idade.
 
@@ -79,9 +82,11 @@ class Trabalhando_var:
         vai de opção em opção da variavel verificando onde tem que aumentar
         e onde tem que diminuir
         """
+        log = []
         idade = banco.groupby('IDADE').size()
         pergunta = 'IDADE'
-
+        log.append('IDADE ' + str(idade['16 a 30']) + ' ' +
+                   str(idade['31 a 50']) + ' ' + str(idade['MAIS DE 50']))
         menor_16 = int(floor(0.2075 * banco.shape[0]))
         maior_16 = int(0.2450 * banco.shape[0])
         menor_50 = int(floor(0.33 * banco.shape[0]))
@@ -91,54 +96,86 @@ class Trabalhando_var:
         idade_50_alterado = randint(menor_50, maior_50)  # gera valor final 50
         # calcula 31 que falta
         idade_31_alterado = 400 - (idade_16_alterado + idade_50_alterado)
-        print('IDADE', idade_16_alterado, idade_31_alterado, idade_50_alterado)
+        log.append('SERÁ ALTERADO ' + str(idade_16_alterado) + ' ' +
+                   str(idade_31_alterado) + ' ' + str(idade_50_alterado))
 
         if idade['16 a 30'] < idade_16_alterado:
             '''se 16 a 30 faltando transfere de 31 a 50 aleatoriamente'''
             alter_mudar = '31 a 50'
             alter_corrente = '16 a 30'
             diferenca = idade_16_alterado - idade[0]  # falta para valor final
-            mudanca.mudar_alternativa(banco=banco, pesq_campo=pesq_campo,
-                                      pergunta=pergunta,
-                                      alter_corrente=alter_corrente,
-                                      alter_mudar=alter_mudar,
-                                      diferenca=diferenca,
-                                      valor_alterado=0)
+            log.append('16 a 30 ' + str(idade['16 a 30']) + ' - VALOR FINAL' +
+                       str(idade_16_alterado) + ' - DIFERENÇA' +
+                       str(diferenca))
+            msg = mudanca.mudar_alternativa(banco=banco, pesq_campo=pesq_campo,
+                                            pergunta=pergunta,
+                                            alter_corrente=alter_corrente,
+                                            alter_mudar=alter_mudar,
+                                            diferenca=diferenca,
+                                            valor_alterado=0)
+            if msg:
+                log.append(msg)
         if idade['MAIS DE 50'] < idade_50_alterado:
             '''se mais de 50 faltando transfere de 31 a 50 aleatoriamente'''
             alter_mudar = '31 a 50'
             alter_corrente = 'MAIS DE 50'
             diferenca = idade_50_alterado - idade[2]
-            mudanca.mudar_alternativa(banco=banco, pesq_campo=pesq_campo,
-                                      pergunta=pergunta,
-                                      alter_corrente=alter_corrente,
-                                      alter_mudar=alter_mudar,
-                                      diferenca=diferenca,
-                                      valor_alterado=0)
+            log.append('MAIS DE 50 ' + str(idade['MAIS DE 50']) + ' - VALOR FINAL' +
+                       str(idade_50_alterado) + ' - DIFERENÇA' +
+                       str(diferenca))
+            msg = mudanca.mudar_alternativa(banco=banco, pesq_campo=pesq_campo,
+                                            pergunta=pergunta,
+                                            alter_corrente=alter_corrente,
+                                            alter_mudar=alter_mudar,
+                                            diferenca=diferenca,
+                                            valor_alterado=0)
+            if msg:
+                log.append(msg)
         idade = banco.groupby('IDADE').size()
         if idade['31 a 50'] < idade_31_alterado:
             '''se 31 a 50 faltando, verifica qual opção
             tem acima e transfere aleatoriamente'''
             alter_corrente = '31 a 50'
             diferenca = idade_31_alterado - idade[1]
+            log.append('31 a 50 ' + str(idade['31 a 50']) + ' - VALOR FINAL ' +
+                       str(idade_31_alterado) + ' - DIFERENÇA ' +
+                       str(diferenca))
             if idade['16 a 30'] > idade_16_alterado:
                 alter_mudar = '16 a 30'
-                diferenca = mudanca.\
+                log.append('    16 a 30 ' + str(idade['16 a 30']) +
+                           ' - VALOR FINAL ' +
+                           str(idade_16_alterado) + ' - DIFERENÇA ' +
+                           str(diferenca))
+                msg, diferenca = mudanca.\
                     mudar_alternativa(banco=banco, pesq_campo=pesq_campo,
                                       pergunta=pergunta,
                                       alter_corrente=alter_corrente,
                                       alter_mudar=alter_mudar,
                                       diferenca=diferenca,
                                       valor_alterado=idade_16_alterado)
+                '''if msg:
+                    log.append(msg)'''
             idade = banco.groupby('IDADE').size()
             if idade['MAIS DE 50'] > idade_50_alterado:
                 alter_mudar = 'MAIS DE 50'
-                mudanca.mudar_alternativa(banco=banco, pesq_campo=pesq_campo,
-                                          pergunta=pergunta,
-                                          alter_corrente=alter_corrente,
-                                          alter_mudar=alter_mudar,
-                                          diferenca=diferenca,
-                                          valor_alterado=idade_50_alterado)
+                log.append('    MAIS DE 50 ' + str(idade['MAIS DE 50']) +
+                           ' - VALOR FINAL ' +
+                           str(idade_50_alterado) + ' - DIFERENÇA ' +
+                           str(diferenca))
+                msg, diferença = mudanca.mudar_alternativa(
+                                     banco=banco,
+                                     pesq_campo=pesq_campo,
+                                     pergunta=pergunta,
+                                     alter_corrente=alter_corrente,
+                                     alter_mudar=alter_mudar,
+                                     diferenca=diferenca,
+                                     valor_alterado=idade_50_alterado)
+                if msg:
+                    log.append(msg)
+        idade = banco.groupby('IDADE').size()
+        log.append('IDADE ACERTADO ' + str(idade['16 a 30']) + ' ' +
+                   str(idade['31 a 50']) + ' ' + str(idade['MAIS DE 50']))
+        return [log]
 
     def arrumar_variaveis_escolaridade(banco, pesq_campo):
         """Função Analisa e acerta variavel escolaridade."""
@@ -294,9 +331,9 @@ class Trabalhando_var:
             eva_alterado = religiao['EVANGÉLICA']
         print('religião', eva_alterado, nt_alterado, outras_alterado)
 
-        writer = pd.ExcelWriter(nome_pla)
+        '''writer = pd.ExcelWriter(nome_pla)
         banco.to_excel(writer, 'Plan1')
-        writer.save()
+        writer.save()'''
 
 def perguntas_pesquisa(banco, pesq_campo, nome_pla):
     lista_perguntas = list(banco.columns)  # lista de perguntas da pesquisa

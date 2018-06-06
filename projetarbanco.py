@@ -1,14 +1,15 @@
 """Classe e Funções que analizam e corrigem diferenças no banco de dados."""
+from salva_arquivo import salvando_arquivo
 import pandas as pd
 from math import floor, ceil
 
 
-class Trabalhando_dados:
+class TrabalhandoDados:
     """Classe com funções que analisa e projeta banco de dados."""
 
     def __init__(self):
-        """inicializadora."""
-        self.banco = ''
+        """Função inicializa."""
+        super(TrabalhandoDados, self).__init__()
 
     def projecao_pesquisa(self, banco, projetado, setor_final, nome_pla):
         """
@@ -18,15 +19,14 @@ class Trabalhando_dados:
         falta cada setor. Armazena em resultado as linhas copiadas depois
         concatena o banco principal com resultado
         """
-        self.banco = banco
         projetado = int(projetado)
-        setor = self.banco.groupby('SETOR').size()
+        setor = banco.groupby('SETOR').size()
         distribuicao = pd.read_excel(setor_final, 'Plan2')
 
         cont = 0
         pulo = 0  # numero de linhas pula em cada setor na projeção
         # cria um dataframe apenas com nomes das colunas
-        resultado = pd.DataFrame(columns=self.banco.columns)
+        resultado = pd.DataFrame(columns=banco.columns)
         log = []
 
         for nome_setor, valor in setor.iteritems():
@@ -50,7 +50,7 @@ class Trabalhando_dados:
                 elif falta < 0:
                     return [f'Setor {nome_setor} está \nacima do numero '
                             f'de entrevista final.']
-                setor_projetando = self.banco.query('SETOR == @nome_setor')
+                setor_projetando = banco.query('SETOR == @nome_setor')
                 linha = 0  # linha a ser copiada
                 cont_falta = 0  # contador para não ultrapassar quantas faltam
                 cont_resto = 1
@@ -71,11 +71,9 @@ class Trabalhando_dados:
                 return['Problema na ordem do setor.']
             cont += 1
 
-        frames = [self.banco, resultado]
+        frames = [banco, resultado]
         resultado = pd.concat(frames, ignore_index=True)
-        resultado['qt_campo'] = self.banco.shape[0]
-        writer = pd.ExcelWriter(nome_pla)
-        resultado.to_excel(writer, 'Plan1')
-        writer.save()
-        self.banco = pd.read_excel(nome_pla, 'Plan1')
-        return ['ok', log, self.banco]  # verificar o que precisa retornar
+        resultado['qt_campo'] = banco.shape[0]
+        salvando_arquivo(resultado, nome_pla)
+        banco = pd.read_excel(nome_pla, 'Plan1')
+        return ['ok', log, banco]  # verificar o que precisa retornar
