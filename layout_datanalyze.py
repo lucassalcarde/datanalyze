@@ -4,7 +4,7 @@ from msgerro import msg_erro
 import projetarbanco
 import datanalyze
 import arquivo
-from salva_arquivo import salvando_arquivo
+from salva_arquivo import salvando_planilha
 import os.path
 import tkinter as tk
 from tkinter import (TOP, RIGHT, LEFT, RAISED, FLAT, SUNKEN, X, W, Y)
@@ -279,26 +279,35 @@ class Aplicacao(tk.Frame):
             """função para analise e acerto de sexo."""
             listavar = trabvar.arruma_variaveis_sexo(self.banco,
                                                      int(self.pesq_campo))
-            # arquivo.grava_arquivo(self.caminho, listavar[0])
             arquivo.grava_arquivo(self.caminho, listavar[0])
             for l in listavar[0]:
                 tx_log.insert(INSERT, l + '\n\n')
-            salvando_arquivo(self.banco, nome_planilha)
+            tx_log.insert(INSERT, '\n\n')
+            salvando_planilha(self.banco, nome_planilha)
             bt_sexo['state'] = DISABLED
 
         def bt_idade_click():
             """função para analise e acerto de idade."""
             listavar = trabvar.arrumar_variaveis_idade(self.banco,
                                                        int(self.pesq_campo))
-            # arquivo.grava_arquivo(self.caminho, listavar[0])
+            arquivo.grava_arquivo(self.caminho, listavar[0])
             for l in listavar[0]:
                 tx_log.insert(INSERT, l + '\n\n')
-            salvando_arquivo(self.banco, nome_planilha)
+            tx_log.insert(INSERT, '\n\n')
+            salvando_planilha(self.banco, nome_planilha)
             bt_idade['state'] = DISABLED
 
         def bt_escolaridade_click():
             """função para analise e acerto de escolaridade."""
-            pass
+            listavar = trabvar.arrumar_variaveis_escolaridade(
+                           self.banco, int(self.pesq_campo))
+            print(listavar[0])
+            arquivo.grava_arquivo(self.caminho, listavar[0])
+            for l in listavar[0]:
+                tx_log.insert(INSERT, l + '\n\n')
+            tx_log.insert(INSERT, '\n\n')
+            salvando_planilha(self.banco, nome_planilha)
+            bt_escolaridade['state'] = DISABLED
 
         def bt_religiao_click():
             """função para analise e acerto de religião."""

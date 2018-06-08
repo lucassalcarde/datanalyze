@@ -1,5 +1,5 @@
 """Classe e Funções que analizam e corrigem diferenças no banco de dados."""
-from salva_arquivo import salvando_arquivo
+from salva_arquivo import salvando_planilha
 import pandas as pd
 from math import floor, ceil
 
@@ -74,6 +74,6 @@ class TrabalhandoDados:
         frames = [banco, resultado]
         resultado = pd.concat(frames, ignore_index=True)
         resultado['qt_campo'] = banco.shape[0]
-        salvando_arquivo(resultado, nome_pla)
+        salvando_planilha(resultado, nome_pla)
         banco = pd.read_excel(nome_pla, 'Plan1')
         return ['ok', log, banco]  # verificar o que precisa retornar

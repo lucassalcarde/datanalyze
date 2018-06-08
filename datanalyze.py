@@ -56,8 +56,8 @@ class TrabalhandoVar:
             sexo_alterado = banco.shape[0] - sexo_alterado
             # diferença a ser alterada
             diferenca = sexo.MASCULINO - sexo_alterado
-            log.append('MASCULINO ' + str(sexo.MASCULINO) + ' - VALOR FINAL' +
-                       str(sexo_alterado) + ' - DIFERENÇA' + str(diferenca))
+            log.append('MASCULINO ' + str(sexo.MASCULINO) + ' - VALOR FINAL ' +
+                       str(sexo_alterado) + ' - DIFERENÇA ' + str(diferenca))
             msg = mudanca.mudar_alternativa(
                       banco=banco,
                       pesq_campo=pesq_campo,
@@ -104,8 +104,8 @@ class TrabalhandoVar:
             alter_mudar = '31 a 50'
             alter_corrente = '16 a 30'
             diferenca = idade_16_alterado - idade[0]  # falta para valor final
-            log.append('16 a 30 ' + str(idade['16 a 30']) + ' - VALOR FINAL' +
-                       str(idade_16_alterado) + ' - DIFERENÇA' +
+            log.append('16 a 30 ' + str(idade['16 a 30']) + ' - VALOR FINAL ' +
+                       str(idade_16_alterado) + ' - DIFERENÇA ' +
                        str(diferenca))
             msg = mudanca.mudar_alternativa(banco=banco, pesq_campo=pesq_campo,
                                             pergunta=pergunta,
@@ -120,9 +120,9 @@ class TrabalhandoVar:
             alter_mudar = '31 a 50'
             alter_corrente = 'MAIS DE 50'
             diferenca = idade_50_alterado - idade[2]
-            log.append('MAIS DE 50 ' + str(idade['MAIS DE 50']) + ' - VALOR FINAL' +
-                       str(idade_50_alterado) + ' - DIFERENÇA' +
-                       str(diferenca))
+            log.append('MAIS DE 50 ' + str(idade['MAIS DE 50']) +
+                       ' - VALOR FINAL ' + str(idade_50_alterado) +
+                       ' - DIFERENÇA ' + str(diferenca))
             msg = mudanca.mudar_alternativa(banco=banco, pesq_campo=pesq_campo,
                                             pergunta=pergunta,
                                             alter_corrente=alter_corrente,
@@ -177,8 +177,9 @@ class TrabalhandoVar:
                    str(idade['31 a 50']) + ' ' + str(idade['MAIS DE 50']))
         return [log]
 
-    def arrumar_variaveis_escolaridade(banco, pesq_campo):
+    def arrumar_variaveis_escolaridade(self, banco, pesq_campo):
         """Função Analisa e acerta variavel escolaridade."""
+        log = []
         pergunta = 'ESCOLARIDADE'
         menor_fund = int(floor(0.39 * banco.shape[0]))
         maior_fund = int(0.42 * banco.shape[0])
@@ -188,33 +189,47 @@ class TrabalhandoVar:
         esco_fund_alterada = randint(menor_fund, maior_fund)
         esco_sup_alterada = randint(menor_sup, maior_sup)
         esco_med_altereada = 400 - (esco_fund_alterada + esco_sup_alterada)
-        print('ESCOLARIDADE', esco_fund_alterada, esco_med_altereada,
-              esco_sup_alterada)
+
         alter_mudar = 'ENSINO MÉDIO'
 
         escolaridade = banco.groupby('ESCOLARIDADE').size()
+        log.append('ESCOLARIDADE ' + str(escolaridade['ENSINO FUNDAMENTAL']) +
+                   ' ' + str(escolaridade['ENSINO MÉDIO']) + ' ' +
+                   str(escolaridade.SUPERIOR))
+        log.append('SERÁ ALTERADO ' + str(esco_fund_alterada) + ' ' +
+                   str(esco_med_altereada) + ' ' + str(esco_sup_alterada))
         if escolaridade['ENSINO FUNDAMENTAL'] < esco_fund_alterada:
             '''se fund. faltando transfere de medio aleatoriamente'''
 
             alter_corrente = 'ENSINO FUNDAMENTAL'
             diferenca = esco_fund_alterada - escolaridade['ENSINO FUNDAMENTAL']
-            mudanca.mudar_alternativa(banco=banco, pesq_campo=pesq_campo,
-                                      pergunta=pergunta,
-                                      alter_corrente=alter_corrente,
-                                      alter_mudar=alter_mudar,
-                                      diferenca=diferenca,
-                                      valor_alterado=0)
+            log.append('FUNDAMENTAL ' + str(escolaridade['ENSINO FUNDAMENTAL']) +
+                       ' - VALOR FINAL ' + str(esco_fund_alterada) +
+                       ' - DIFERENÇA ' + str(diferenca))
+            msg = mudanca.mudar_alternativa(banco=banco, pesq_campo=pesq_campo,
+                                            pergunta=pergunta,
+                                            alter_corrente=alter_corrente,
+                                            alter_mudar=alter_mudar,
+                                            diferenca=diferenca,
+                                            valor_alterado=0)
+            if msg:
+                log.append(msg)
         escolaridade = banco.groupby('ESCOLARIDADE').size()
         if escolaridade.SUPERIOR < esco_sup_alterada:
             '''se superior faltando transfere de medio aleatoriamente'''
             alter_corrente = 'SUPERIOR'
             diferenca = esco_sup_alterada - escolaridade.SUPERIOR
-            mudanca.mudar_alternativa(banco=banco, pesq_campo=pesq_campo,
-                                      pergunta=pergunta,
-                                      alter_corrente=alter_corrente,
-                                      alter_mudar=alter_mudar,
-                                      diferenca=diferenca,
-                                      valor_alterado=0)
+            log.append('SUPERIOR ' + str(escolaridade.SUPERIOR) +
+                       ' - VALOR FINAL ' + str(esco_sup_alterada) +
+                       ' - DIFERENÇA ' + str(diferenca))
+            msg = mudanca.mudar_alternativa(banco=banco, pesq_campo=pesq_campo,
+                                            pergunta=pergunta,
+                                            alter_corrente=alter_corrente,
+                                            alter_mudar=alter_mudar,
+                                            diferenca=diferenca,
+                                            valor_alterado=0)
+            if msg:
+                log.append(msg)
         escolaridade = banco.groupby('ESCOLARIDADE').size()
         if escolaridade['ENSINO MÉDIO'] < esco_med_altereada:
             '''se medio faltando, verifica qual opção tem acima e
@@ -222,23 +237,44 @@ class TrabalhandoVar:
             alter_corrente = 'ENSINO MÉDIO'
             diferenca = esco_med_altereada - escolaridade[1]
             # contador = 0
+            log.append('MÉDIO ' + str(escolaridade['ENSINO MÉDIO']) +
+                       ' - VALOR FINAL ' + str(esco_med_altereada) +
+                       ' - DIFERENÇA ' + str(diferenca))
             if escolaridade['ENSINO FUNDAMENTAL'] > esco_fund_alterada:
                 alter_mudar = 'ENSINO FUNDAMENTAL'
-                diferenca = mudanca. \
+                log.append('FUNDAMENTAL ' +
+                           str(escolaridade['ENSINO FUNDAMENTAL']) +
+                           ' - VALOR FINAL ' + str(esco_fund_alterada) +
+                           ' - DIFERENÇA ' + str(diferenca))
+                msg, diferenca = mudanca. \
                     mudar_alternativa(banco=banco, pesq_campo=pesq_campo,
                                       pergunta=pergunta,
                                       alter_corrente=alter_corrente,
                                       alter_mudar=alter_mudar,
                                       diferenca=diferenca,
                                       valor_alterado=esco_fund_alterada)
+                if msg:
+                    log.append(msg)
             if escolaridade.SUPERIOR > esco_sup_alterada:
                 alter_mudar = 'SUPERIOR'
-                mudanca.mudar_alternativa(banco=banco, pesq_campo=pesq_campo,
-                                          pergunta=pergunta,
-                                          alter_corrente=alter_corrente,
-                                          alter_mudar=alter_mudar,
-                                          diferenca=diferenca,
-                                          valor_alterado=esco_sup_alterada)
+                log.append('SUPERIOR ' + str(escolaridade.SUPERIOR) +
+                           ' - VALOR FINAL ' + str(esco_sup_alterada) +
+                           ' - DIFERENÇA ' + str(diferenca))
+                msg, diferenca = mudanca.mudar_alternativa(
+                                     banco=banco,
+                                     pesq_campo=pesq_campo,
+                                     pergunta=pergunta,
+                                     alter_corrente=alter_corrente,
+                                     alter_mudar=alter_mudar,
+                                     diferenca=diferenca,
+                                     valor_alterado=esco_sup_alterada)
+                if msg:
+                    log.append(msg)
+        escolaridade = banco.groupby('ESCOLARIDADE').size()
+        log.append('FINAL ' + str(escolaridade['ENSINO FUNDAMENTAL']) +
+                   ' ' + str(escolaridade['ENSINO MÉDIO']) + ' ' +
+                   str(escolaridade.SUPERIOR))
+        return [log]
 
     def arrumar_variaveis_religiao(banco, pesq_campo, nome_pla):
         """Função analisa e corrige variavel religião."""
