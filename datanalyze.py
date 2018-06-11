@@ -276,10 +276,14 @@ class TrabalhandoVar:
                    str(escolaridade.SUPERIOR))
         return [log]
 
-    def arrumar_variaveis_religiao(banco, pesq_campo, nome_pla):
+    def arrumar_variaveis_religiao(self, banco, pesq_campo):
         """Função analisa e corrige variavel religião."""
+        log = []
         pergunta = 'RELIGIÃO'
         religiao = banco.groupby('RELIGIÃO').size()
+        log.append('RELIGIÃO ' + str(religiao['CATÓLICA']) + ' ' +
+                   str(religiao['EVANGÉLICA']) + ' ' +
+                   str(religiao['NÃO TEM']) + ' ' + str(religiao.OUTRAS))
         menos_outras = int(floor(0.0275 * banco.shape[0]))
         maior_outras = int(0.05 * banco.shape[0])
         if religiao.OUTRAS not in range(menos_outras, maior_outras):
@@ -289,24 +293,32 @@ class TrabalhandoVar:
                 diferenca = religiao.OUTRAS - outras_alterado
                 alter_mudar = 'OUTRAS'
                 alter_corrente = 'CATÓLICA'
-                mudanca.mudar_alternativa(banco=banco, pesq_campo=pesq_campo,
-                                          pergunta=pergunta,
-                                          alter_corrente=alter_corrente,
-                                          alter_mudar=alter_mudar,
-                                          diferenca=diferenca,
-                                          valor_alterado=outras_alterado)
+                log.append('OUTRAS ' + str(religiao.OUTRAS) +
+                           ' - VALOR FINAL ' + str(outras_alterado) +
+                           ' - DIFERENÇA ' + str(diferenca))
+                msg = mudanca.mudar_alternativa(banco=banco,
+                                                pesq_campo=pesq_campo,
+                                                pergunta=pergunta,
+                                                alter_corrente=alter_corrente,
+                                                alter_mudar=alter_mudar,
+                                                diferenca=diferenca,
+                                                valor_alterado=outras_alterado)
             if religiao.OUTRAS < outras_alterado:
                 diferenca = outras_alterado - religiao.OUTRAS
                 alter_mudar = 'CATÓLICA'
                 alter_corrente = 'OUTRAS'
-                mudanca.mudar_alternativa(banco=banco, pesq_campo=pesq_campo,
-                                          pergunta=pergunta,
-                                          alter_corrente=alter_corrente,
-                                          alter_mudar=alter_mudar,
-                                          diferenca=diferenca,
-                                          valor_alterado=0)
+                log.append('OUTRAS ' + str(religiao.OUTRAS) +
+                           ' - VALOR FINAL ' + str(outras_alterado) +
+                           ' - DIFERENÇA ' + str(diferenca))
+                msg = mudanca.mudar_alternativa(banco=banco,
+                                                pesq_campo=pesq_campo,
+                                                pergunta=pergunta,
+                                                alter_corrente=alter_corrente,
+                                                alter_mudar=alter_mudar,
+                                                diferenca=diferenca,
+                                                valor_alterado=0)
         else:
-            print('outras correto')
+            log.append('outras correto')
             outras_alterado = religiao.OUTRAS
 
         menos_nt = int(floor(0.06 * banco.shape[0]))
@@ -317,24 +329,32 @@ class TrabalhandoVar:
                 diferenca = religiao['NÃO TEM'] - nt_alterado
                 alter_mudar = 'NÃO TEM'
                 alter_corrente = 'CATÓLICA'
-                mudanca.mudar_alternativa(banco=banco, pesq_campo=pesq_campo,
-                                          pergunta=pergunta,
-                                          alter_corrente=alter_corrente,
-                                          alter_mudar=alter_mudar,
-                                          diferenca=diferenca,
-                                          valor_alterado=nt_alterado)
+                log.append('NÃO TEM ' + str(religiao['NÃO TEM']) +
+                           ' - VALOR FINAL ' + str(nt_alterado) +
+                           ' - DIFERENÇA ' + str(diferenca))
+                msg = mudanca.mudar_alternativa(banco=banco,
+                                                pesq_campo=pesq_campo,
+                                                pergunta=pergunta,
+                                                alter_corrente=alter_corrente,
+                                                alter_mudar=alter_mudar,
+                                                diferenca=diferenca,
+                                                valor_alterado=nt_alterado)
             if religiao['NÃO TEM'] < nt_alterado:
                 diferenca = nt_alterado - religiao['NÃO TEM']
                 alter_mudar = 'CATÓLICA'
                 alter_corrente = 'NÃO TEM'
-                mudanca.mudar_alternativa(banco=banco, pesq_campo=pesq_campo,
-                                          pergunta=pergunta,
-                                          alter_corrente=alter_corrente,
-                                          alter_mudar=alter_mudar,
-                                          diferenca=diferenca,
-                                          valor_alterado=0)
+                log.append('NÃO TEM ' + str(religiao['NÃO TEM']) +
+                           ' - VALOR FINAL ' + str(nt_alterado) +
+                           ' - DIFERENÇA ' + str(diferenca))
+                msg = mudanca.mudar_alternativa(banco=banco,
+                                                pesq_campo=pesq_campo,
+                                                pergunta=pergunta,
+                                                alter_corrente=alter_corrente,
+                                                alter_mudar=alter_mudar,
+                                                diferenca=diferenca,
+                                                valor_alterado=0)
         else:
-            print('não tem correto')
+            log.append('não tem correto')
             nt_alterado = religiao['NÃO TEM']
 
         religiao = banco.groupby('RELIGIÃO').size()
@@ -346,30 +366,42 @@ class TrabalhandoVar:
                 diferenca = eva_alterado - religiao['EVANGÉLICA']
                 alter_mudar = 'CATÓLICA'
                 alter_corrente = 'EVANGÉLICA'
-                mudanca.mudar_alternativa(banco=banco, pesq_campo=pesq_campo,
-                                          pergunta=pergunta,
-                                          alter_corrente=alter_corrente,
-                                          alter_mudar=alter_mudar,
-                                          diferenca=diferenca,
-                                          valor_alterado=0)
+                log.append('EVANGÉLICA ' + str(religiao['EVANGÉLICA']) +
+                           ' - VALOR FINAL ' + str(eva_alterado) +
+                           ' - DIFERENÇA ' + str(diferenca))
+                msg = mudanca.mudar_alternativa(banco=banco,
+                                                pesq_campo=pesq_campo,
+                                                pergunta=pergunta,
+                                                alter_corrente=alter_corrente,
+                                                alter_mudar=alter_mudar,
+                                                diferenca=diferenca,
+                                                valor_alterado=0)
             if religiao['EVANGÉLICA'] > eva_alterado:
                 diferenca = religiao['EVANGÉLICA'] - eva_alterado
                 alter_mudar = 'EVANGÉLICA'
                 alter_corrente = 'CATÓLICA'
-                mudanca.mudar_alternativa(banco=banco, pesq_campo=pesq_campo,
-                                          pergunta=pergunta,
-                                          alter_corrente=alter_corrente,
-                                          alter_mudar=alter_mudar,
-                                          diferenca=diferenca,
-                                          valor_alterado=eva_alterado)
+                log.append('EVANGÉLICA ' + str(religiao['EVANGÉLICA']) +
+                           ' - VALOR FINAL ' + str(eva_alterado) +
+                           ' - DIFERENÇA ' + str(diferenca))
+                msg = mudanca.mudar_alternativa(banco=banco,
+                                                pesq_campo=pesq_campo,
+                                                pergunta=pergunta,
+                                                alter_corrente=alter_corrente,
+                                                alter_mudar=alter_mudar,
+                                                diferenca=diferenca,
+                                                valor_alterado=eva_alterado)
         else:
-            print('evangelico correto')
+            log.append('evangelico correto')
             eva_alterado = religiao['EVANGÉLICA']
-        print('religião', eva_alterado, nt_alterado, outras_alterado)
-
-        '''writer = pd.ExcelWriter(nome_pla)
-        banco.to_excel(writer, 'Plan1')
-        writer.save()'''
+        cat_alterado = 400 - (eva_alterado + nt_alterado + outras_alterado)
+        log.append('SERÁ ALTERADO ' + str(cat_alterado) + ' ' +
+                   str(eva_alterado) + ' ' + str(nt_alterado) + ' ' +
+                   str(outras_alterado))
+        religiao = banco.groupby('RELIGIÃO').size()
+        log.append('FINAL ' + str(religiao['CATÓLICA']) + ' ' +
+                   str(religiao['EVANGÉLICA']) + ' ' +
+                   str(religiao['NÃO TEM']) + ' ' + str(religiao.OUTRAS))
+        return [log]
 
 def perguntas_pesquisa(banco, pesq_campo, nome_pla):
     lista_perguntas = list(banco.columns)  # lista de perguntas da pesquisa

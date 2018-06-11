@@ -6,10 +6,9 @@ import datanalyze
 import arquivo
 from salva_arquivo import salvando_planilha
 import os.path
-import tkinter as tk
 from tkinter import (TOP, RIGHT, LEFT, RAISED, FLAT, SUNKEN, X, W, Y)
-from tkinter import (PhotoImage, Button, Label, Entry, IntVar, Radiobutton,
-                     Scrollbar, Text, INSERT, DISABLED)
+from tkinter import (Tk, Frame, PhotoImage, Button, Label, Entry, IntVar,
+                     Radiobutton, Scrollbar, Text, INSERT, DISABLED)
 from tkinter import *  #NOQA
 from tkinter.filedialog import askopenfilename
 
@@ -18,12 +17,12 @@ trabdados = projetarbanco.TrabalhandoDados()
 trabvar = datanalyze.TrabalhandoVar()
 
 
-class Aplicacao(tk.Frame):
+class Aplicacao(Frame):
     """Classe do layout."""
 
     def __init__(self, master=None):
         """Função inicializadora."""
-        tk.Frame.__init__(self, master, bd=2)
+        Frame.__init__(self, master, bd=2)
         self.Corpo_Menu()
         self.Tela_inicial()
         self.frametl_abrirtotal = ''  # frame externo usado construir cada tela
@@ -34,7 +33,7 @@ class Aplicacao(tk.Frame):
 
     def Corpo_Menu(self):
         """Função do Menu."""
-        frametl = tk.Frame(self.master, bd=1, relief=RAISED)
+        frametl = Frame(self.master, bd=1, relief=RAISED)
 
         img_abrir = PhotoImage(file=r'imagens\abrir.png')
         bt_abrir = Button(frametl, image=img_abrir, relief=FLAT,
@@ -67,10 +66,12 @@ class Aplicacao(tk.Frame):
         """Corpo da tela inicial."""
         self.lb_status = Label(root, bg='black', fg='white', pady=1, padx=1,
                                text='Nenhum Banco de Dados Aberto',
-                               width=w, height=1, font=('Verdana', 10, 'bold'),
+                               width=w, height=1,
+                               font=('Verdana', 10, 'bold'),
                                borderwidth=10, relief=SUNKEN)
         self.lb_status.pack()
-        self.lb_statusqt = Label(root, bg='black', fg='white', pady=1, padx=1,
+        self.lb_statusqt = Label(root, bg='black', fg='white',
+                                 pady=1, padx=1,
                                  width=w, height=1,
                                  font=('Verdana', 10, 'bold'),
                                  borderwidth=10, relief=SUNKEN)
@@ -82,7 +83,7 @@ class Aplicacao(tk.Frame):
 
     '''def msg_erro(self):
         """Popup de mensagens de erro."""
-        popup = tk.Tk()
+        popup = Tk()
         popup.wm_title('Erro')
         lb_erro = Label(popup, text=self.mensagem, width=40, height=10)
         lb_erro.pack(side=TOP)
@@ -148,9 +149,9 @@ class Aplicacao(tk.Frame):
 
         # banco, nome_pla, projetado, pesq_campo = bd.abrir_banco()
         # self.lb_status['text'] = f'{nome_pla}\n{projetado} {pesq_campo}'
-        self.frametl_abrirtotal = tk.Frame(self.master, bd=1, relief=FLAT)
-        frametlalinha = tk.Frame(self.frametl_abrirtotal, bd=1, relief=FLAT)
-        frametl_abrir = tk.Frame(frametlalinha, bd=1, relief=FLAT)
+        self.frametl_abrirtotal = Frame(self.master, bd=1, relief=FLAT)
+        frametlalinha = Frame(self.frametl_abrirtotal, bd=1, relief=FLAT)
+        frametl_abrir = Frame(frametlalinha, bd=1, relief=FLAT)
         modelo = r'Digite nome do arquivo igual o modelo ' \
                  r'/2018/MAIO/SÃO PAULO/SÃO PAULO.xls'
         lb_nome = Label(frametl_abrir, text=modelo, anchor=W)
@@ -164,7 +165,7 @@ class Aplicacao(tk.Frame):
         bt_abrir.pack(side=LEFT, pady=12)
         frametl_abrir.pack(side=LEFT)
 
-        frametl_projecao = tk.Frame(frametlalinha, bd=1, relief=FLAT)
+        frametl_projecao = Frame(frametlalinha, bd=1, relief=FLAT)
         lb_projecao = Label(frametl_projecao,
                             text='Arquivo Já está projetado?')
         lb_projecao.pack(side=TOP, padx=2, pady=2)
@@ -176,9 +177,10 @@ class Aplicacao(tk.Frame):
                     variable=self.rb_projecao).pack(anchor=W)
         frametl_projecao.pack(side=LEFT, padx=50)
 
-        frametl_val_projecao = tk.Frame(frametlalinha, bd=1,
-                                        relief=FLAT)
-        lb_val_projecao = Label(frametl_val_projecao, text='Valor Projeção')
+        frametl_val_projecao = Frame(frametlalinha, bd=1,
+                                     relief=FLAT)
+        lb_val_projecao = Label(frametl_val_projecao,
+                                text='Valor Projeção')
         lb_val_projecao.pack(side=TOP, ipadx=2, pady=13)
         ed_val_projecao = Entry(frametl_val_projecao, width=20)
         ed_val_projecao.pack(side=TOP, padx=2, pady=13)
@@ -233,12 +235,12 @@ class Aplicacao(tk.Frame):
 
         if self.frametl_abrirtotal:
             self.finaliza_frame()
-        self.frametl_abrirtotal = tk.Frame(self.master, bd=1, relief=FLAT)
+        self.frametl_abrirtotal = Frame(self.master, bd=1, relief=FLAT)
         modelo = r'Digite nome do arquivo de distribuição igual o modelo ' \
                  r'/2018/MAIO/SÃO PAULO/DISTRIBUIÇÃO SÃO PAULO.xls'
         lb_dist = Label(self.frametl_abrirtotal, text=modelo)
         lb_dist.pack(side=TOP, padx=2, pady=1)
-        frametllinha = tk.Frame(self.frametl_abrirtotal, bd=1, relief=FLAT)
+        frametllinha = Frame(self.frametl_abrirtotal, bd=1, relief=FLAT)
         self.ed_dist = Entry(frametllinha, width=60)
         self.ed_dist.pack(side=LEFT, padx=2, pady=1)
         img_abrir = PhotoImage(file=r'imagens\abrir-menor.png')
@@ -259,7 +261,7 @@ class Aplicacao(tk.Frame):
             bt_projetar['state'] = DISABLED
         lbespaco = Label(self.frametl_abrirtotal)
         lbespaco.pack(side=TOP, pady=20)
-        frametllog = tk.Frame(self.frametl_abrirtotal, bd=1, relief=FLAT)
+        frametllog = Frame(self.frametl_abrirtotal, bd=1, relief=FLAT)
         barra = Scrollbar(self.frametl_abrirtotal)
         tx_log = Text(self.frametl_abrirtotal, width=75, height=20)
         barra.pack(side=RIGHT, fill=Y)
@@ -285,6 +287,7 @@ class Aplicacao(tk.Frame):
             tx_log.insert(INSERT, '\n\n')
             salvando_planilha(self.banco, nome_planilha)
             bt_sexo['state'] = DISABLED
+            bt_todos['state'] = DISABLED
 
         def bt_idade_click():
             """função para analise e acerto de idade."""
@@ -296,33 +299,49 @@ class Aplicacao(tk.Frame):
             tx_log.insert(INSERT, '\n\n')
             salvando_planilha(self.banco, nome_planilha)
             bt_idade['state'] = DISABLED
+            bt_todos['state'] = DISABLED
 
         def bt_escolaridade_click():
             """função para analise e acerto de escolaridade."""
             listavar = trabvar.arrumar_variaveis_escolaridade(
                            self.banco, int(self.pesq_campo))
-            print(listavar[0])
             arquivo.grava_arquivo(self.caminho, listavar[0])
             for l in listavar[0]:
                 tx_log.insert(INSERT, l + '\n\n')
             tx_log.insert(INSERT, '\n\n')
             salvando_planilha(self.banco, nome_planilha)
             bt_escolaridade['state'] = DISABLED
+            bt_todos['state'] = DISABLED
 
         def bt_religiao_click():
             """função para analise e acerto de religião."""
-            pass
+            listavar = trabvar.arrumar_variaveis_religiao(
+                           self.banco, int(self.pesq_campo))
+            arquivo.grava_arquivo(self.caminho, listavar[0])
+            for l in listavar[0]:
+                tx_log.insert(INSERT, l + '\n\n')
+            tx_log.insert(INSERT, '\n\n')
+            salvando_planilha(self.banco, nome_planilha)
+            bt_religiao['state'] = DISABLED
+            bt_todos['state'] = DISABLED
 
-        self.frametl_abrirtotal = tk.Frame(self.master, bd=1, relief=FLAT)
-        frametl_left = tk.Frame(self.frametl_abrirtotal, bd=1, relief=FLAT)
+        def bt_todos_click():
+            """função analise e acerto de todas variaveis de uma vez."""
+            bt_sexo_click()
+            bt_idade_click()
+            bt_escolaridade_click()
+            bt_religiao_click()
+
+        self.frametl_abrirtotal = Frame(self.master, bd=1, relief=FLAT)
+        frametl_left = Frame(self.frametl_abrirtotal, bd=1, relief=FLAT)
         bt_todos = Button(frametl_left, text='ARRUMAR TODOS',
-                          command='', width=20)
+                          command=bt_todos_click, width=20)
         bt_todos.pack(side=TOP, pady=20)
         bt_sexo = Button(frametl_left, text='SEXO', command=bt_sexo_click,
                          width=20)
         bt_sexo.pack(side=TOP, pady=20)
-        bt_idade = Button(frametl_left, text='IDADE', command=bt_idade_click,
-                          width=20)
+        bt_idade = Button(frametl_left, text='IDADE',
+                          command=bt_idade_click, width=20)
         bt_idade.pack(side=TOP, pady=20)
         bt_escolaridade = Button(frametl_left, text='ESCOLARIDADE',
                                  command=bt_escolaridade_click, width=20)
@@ -331,7 +350,7 @@ class Aplicacao(tk.Frame):
                              command=bt_religiao_click, width=20)
         bt_religiao.pack(side=TOP, pady=20)
         frametl_left.pack(side=LEFT, pady=80, padx=20)
-        frametl_right = tk.Frame(self.frametl_abrirtotal, bd=1, relief=FLAT)
+        frametl_right = Frame(self.frametl_abrirtotal, bd=1, relief=FLAT)
         barra = Scrollbar(frametl_right)
         tx_log = Text(frametl_right, width=75, height=20)
         barra.pack(side=RIGHT, fill=Y)
@@ -342,7 +361,7 @@ class Aplicacao(tk.Frame):
         self.frametl_abrirtotal.pack(side=TOP)
 
 
-root = tk.Tk()
+root = Tk()
 w, h = root.winfo_screenwidth(), root.winfo_screenheight()
 root.geometry(f'{w}x{h}+0+0')
 root.title('Datanalyze')
